@@ -41,8 +41,8 @@ Recommend to use [this terraform template](https://github.com/megamattzilla/terr
 
 ### Clone Repo
 ```bash
-git clone git@github.com:megamattzilla/aigw-all-in-one.git
-cd aigw-all-in-one
+git clone git@github.com:megamattzilla/f5-ai-gateway-demo.git
+cd f5-ai-gateway-demo
 ```
  
 ### Setup Secrets
@@ -64,7 +64,7 @@ docker login private-registry.f5.com --username $JWT --password none
 Create F5 AI Gateway license file
 ```bash
 echo F5_LICENSE=$JWT > aigw-jwt.env 
-#Make sure you are in aigw-all-in-one folder
+#Make sure you are in f5-ai-gateway-demo folder
 ```
 
 ### Fix Docker Permissions (If you cannot run docker without sudo)
