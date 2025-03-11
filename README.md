@@ -41,7 +41,7 @@ Recommend to use [this terraform template](https://github.com/megamattzilla/terr
 
 ### Clone Repo
 ```bash
-git clone git@github.com:megamattzilla/f5-ai-gateway-demo.git
+git clone https://github.com/megamattzilla/f5-ai-gateway-demo.git
 cd f5-ai-gateway-demo
 ```
  
