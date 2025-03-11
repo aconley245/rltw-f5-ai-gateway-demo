@@ -1,0 +1,110 @@
+services:
+
+  open-webui-protected:
+    container_name: open-webui-protected
+    image: ghcr.io/open-webui/open-webui
+    environment:
+      WEBUI_AUTH: False
+      WEBUI_NAME: Protected
+      OPENAI_API_BASE_URL: http://aigw:4141/v1
+      ENABLE_OLLAMA_API: false
+      OPENAI_API_KEY: 42
+    ports:
+      - 9090:8080
+    volumes:
+      - ./service/open-webui/protected_webui.db:/app/backend/data/webui.db
+    networks:
+      - aigw
+
+  open-webui-unprotected:
+    container_name: open-webui-unprotected
+    image: ghcr.io/open-webui/open-webui
+    environment:
+      WEBUI_AUTH: False
+      WEBUI_NAME: Un-Protected
+      OPENAI_API_BASE_URL: http://ollama:11434/v1
+      ENABLE_OLLAMA_API: false
+      OPENAI_API_KEY: 42
+    ports:
+      - 9091:8080
+    volumes:
+      - ./service/open-webui/unprotected_webui.db:/app/backend/data/webui.db
+    networks:
+      - aigw
+
+  aigw:
+    container_name: aigw
+    image: private-registry.f5.com/aigw/aigw:v1.0.0
+    env_file: "aigw-jwt.env"
+    command:
+      - start
+      - /etc/aigw.yaml
+      - --exporter-enable
+      - --exporter-type=stdout
+    ports:
+      - 80:4141
+      - 8080:8080
+    volumes:
+      - ./inbound-config.yaml:/etc/aigw.yaml
+      - ./aigw.openai.secret:/etc/openai
+    networks:
+      - aigw
+    depends_on:
+      aigw-processors-f5:
+        condition: service_healthy
+
+  aigw-processors-f5:
+    container_name: aigw-processors-f5
+    image: private-registry.f5.com/aigw/aigw-processors-f5:v1.0.0
+    environment:
+      TLS_ENABLED: false
+      ENABLE_GPU: true
+    restart: on-failure
+    volumes:
+      - ./service/aigw-processors-f5/healthcheck.py:/var/tmp/healthcheck.py
+    ports:
+      - 8000:8000
+    networks:
+      - aigw
+    healthcheck:
+      test: python /var/tmp/healthcheck.py
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - ./service/ollama:/model_files  # Mount the directory with the ModelFile
+    entrypoint: ["/bin/sh", "/model_files/run_ollama.sh"] # Loading the custom Modelfile
+    container_name: ollama
+#    pull_policy: always
+    tty: true
+    restart: always
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - aigw
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+networks:
+  aigw:
+
+

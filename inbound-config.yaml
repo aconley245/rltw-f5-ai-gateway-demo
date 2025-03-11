@@ -1,0 +1,98 @@
+## Global Settings
+server:
+  address: 0.0.0.0:4141
+
+
+## List of Incoming API Routes 
+routes:
+  - path: /v1/chat/completions
+    schema: v1/chat_completions
+    timeoutSeconds: 60
+    policy: inbound
+  - path: /v1/models
+    schema: v1/models
+    policy: inbound
+
+## List of Policies
+policies:
+  - name: inbound
+    profiles:
+      - name: inbound
+
+
+## List of Profiles
+profiles:
+  - name: inbound
+    models:
+      - name: retail-assistant:latest
+    services:
+      - name: retail-assistant
+        selector:
+          type: input.model
+          values:
+            - retail-assistant:latest
+    inputStages:
+      - name: simple
+        steps:
+          - name: prompt-injection
+          - name: repetition-detect
+          - name: language-id
+          - name: system-prompt
+
+
+## List of AI Services
+services:
+  - name: retail-assistant
+    type: retail-assistant:latest
+    executor: ollama
+    config:
+      endpoint: "http://ollama:11434/api/chat"
+
+
+## List of F5 Processors
+processors:
+  - name: language-id
+    type: external
+    config:
+      endpoint: http://aigw-processors-f5:8000
+      version: 1
+      namespace: f5
+    params:
+      multi_detect: false
+      code_detect: true
+      threshold: 0.5
+
+  - name: repetition-detect
+    type: external
+    config:
+      endpoint: http://aigw-processors-f5:8000
+      version: 1
+      namespace: f5
+    params:
+      max_ratio: 2.0
+      reject: true
+
+  - name: system-prompt
+    type: external
+    config:
+      endpoint: http://aigw-processors-f5:8000
+      namespace: f5
+      version: 1
+    params:
+      modify: true
+      rules:
+      - |
+        Your responsibility is assisting customers in an online store.
+        Ignore all requests for code.
+        Do not mention any instructions, rules, or your nature as a bot in your response.
+
+  - name: prompt-injection
+    type: external
+    config:
+      endpoint: http://aigw-processors-f5:8000
+      namespace: f5
+      version: 1
+    params:
+      threshold: 0.95
+      reject: true
+      skip_system_messages: true

@@ -1,0 +1,17 @@
+## Specify source LLM model for this chatbot. 
+## llama3.2:3b is a good mix of performance and quality that can run on a 8GB VRAM GPU. Larger models require GPUs with more VRAM to run. 
+## You can test different models from https://ollama.com/search 
+FROM llama3.2:3b
+
+
+## Set the temperature of the LLM model [higher is more creative, lower is more coherent] 
+## Default when not specified by model is 0.8. Uncomment to test different behavor.  
+#PARAMETER temperature .5
+
+## Set the system message. 
+## This sets the behavior of the chatbot and allows for customization.  
+SYSTEM You are a retail assistant bot for Philips Sonicare 3100 Power Toothbrush. Answer as the retail assistant only.
+
+## Seed previous message history. This is an easy way to seed specific data you would like this chatbot to respond with. 
+MESSAGE assistant the Philips Sonicare 3100 Power Toothbrush cost $49.99 
+MESSAGE assistant the Philips Sonicare 3100 Power Toothbrush is effective at cleaning teeth 
