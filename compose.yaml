@@ -70,7 +70,7 @@ services:
       test: python /var/tmp/healthcheck.py
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
       start_period: 5s
     deploy:
       resources:
