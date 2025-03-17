@@ -46,7 +46,8 @@ cd f5-ai-gateway-demo
 ```
  
 ### Setup Secrets
-Obtain your AI Gateway JWT token from https://my.f5.com. Your F5 account team can generate a trial token for you. 
+Obtain your AI Gateway trial license. (JWT token)  
+If you need a JWT token, have your F5 account team generate a free NGINX One trial for you (F5-NGX-ONE-TRIAL). 
 
 Set environment variable with your JWT token 
 ```bash
