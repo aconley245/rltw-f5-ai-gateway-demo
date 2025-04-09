@@ -46,7 +46,7 @@ services:
     type: banking-assistant:latest
     executor: ollama
     config:
-      endpoint: "http://ollama:11434/api/generate"
+      endpoint: "http://ollama:11434/api/chat"
 
 
 ## List of F5 Processors
