@@ -34,7 +34,7 @@ services:
 
   aigw:
     container_name: aigw
-    image: private-registry.f5.com/aigw/aigw:v1.0.0
+    image: private-registry.f5.com/aigw/aigw:v1.0.2
     env_file: "aigw-jwt.env"
     command:
       - start
